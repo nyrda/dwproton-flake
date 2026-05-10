@@ -13,6 +13,13 @@ if [[ -z "$tag" || "$tag" != dwproton-* ]]; then
 fi
 
 version="${tag#dwproton-}"
+current_version="$(sed -n 's/.*version = "\([^"]*\)";.*/\1/p' "$package_file" | head -n1)"
+
+if [[ "$current_version" == "$version" ]]; then
+  echo "DWProton is already up to date: $version"
+  exit 0
+fi
+
 asset_name="dwproton-${version}-x86_64.tar.xz"
 asset_url="$(jq -r --arg name "$asset_name" '.assets[]? | select(.name == $name) | .browser_download_url' <<<"$release_json" | head -n1)"
 
