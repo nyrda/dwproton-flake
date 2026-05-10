@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   update:
@@ -34,15 +33,21 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
+            version="$(sed -n 's/.*version = "\([^"]*\)";.*/\1/p' default.nix | head -n1)"
+            echo "version=$version" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create pull request
+      - name: Commit and tag update
         if: steps.changes.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@v7
-        with:
-          commit-message: "Update DWProton"
-          title: "Update DWProton"
-          body: "Automated update from the latest Dawn Winery DWProton release."
-          branch: update/dwproton
-          delete-branch: true
-          add-paths: default.nix
+        run: |
+          version="${{ steps.changes.outputs.version }}"
+          tag="dwproton-${version}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add default.nix
+          git commit -m "Update DWProton to ${version}"
+          git tag -a "$tag" -m "DWProton ${version}"
+          git push origin HEAD:main
+          git push origin "$tag"
