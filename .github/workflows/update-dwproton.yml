@@ -48,6 +48,11 @@ jobs:
 
           git add default.nix
           git commit -m "Update DWProton to ${version}"
-          git tag -a "$tag" -m "DWProton ${version}"
           git push origin HEAD:main
-          git push origin "$tag"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+            echo "Tag $tag already exists"
+          else
+            git tag -a "$tag" -m "DWProton ${version}"
+            git push origin "$tag"
+          fi
