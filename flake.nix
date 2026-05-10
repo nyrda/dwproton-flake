@@ -24,7 +24,7 @@
       buildInputs = with pkgs; [
         curl
         jq
-        nix-prefetch-url
+        nix
       ];
     };
   };

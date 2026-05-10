@@ -18,7 +18,7 @@ Add the flake to your inputs and add the package to `programs.steam.extraCompatP
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    dw-proton.url = "github:imaviso/dwproton-flake";
+    dw-proton.url = "github:nyrda/dwproton-flake";
   };
 
   outputs = { self, nixpkgs, dw-proton, ... }: {
@@ -52,7 +52,9 @@ nix build
 
 ## Updates
 
-This flake automatically checks for new DW-Proton releases daily and creates pull requests when updates are available.
+This fork tracks the original packaging at <https://github.com/imaviso/dwproton-flake>.
+
+The GitHub Actions workflow checks Dawn Winery releases daily and creates pull requests when updates are available.
 
 ## License
 

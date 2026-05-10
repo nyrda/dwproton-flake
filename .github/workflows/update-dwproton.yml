@@ -1,0 +1,37 @@
+name: Update DWProton
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v17
+
+      - name: Update package
+        run: ./scripts/update-dwproton.sh
+
+      - name: Validate flake
+        run: |
+          nix flake check --impure
+          nix build .#dw-proton --impure
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "Update DWProton"
+          title: "Update DWProton"
+          body: "Automated update from the latest Dawn Winery DWProton release."
+          branch: update/dwproton
+          delete-branch: true
