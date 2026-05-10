@@ -25,9 +25,19 @@ jobs:
       - name: Validate flake
         run: |
           nix flake check --impure
-          nix build .#dw-proton --impure
+          nix build .#dw-proton --impure --no-link
+
+      - name: Check for package changes
+        id: changes
+        run: |
+          if git diff --quiet -- default.nix; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Create pull request
+        if: steps.changes.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: "Update DWProton"
@@ -35,3 +45,4 @@ jobs:
           body: "Automated update from the latest Dawn Winery DWProton release."
           branch: update/dwproton
           delete-branch: true
+          add-paths: default.nix
